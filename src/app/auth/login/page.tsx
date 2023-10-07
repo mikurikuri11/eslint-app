@@ -1,12 +1,11 @@
 'use client'
 
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useForm, SubmitHandler } from 'react-hook-form'
 
 import { auth } from '@/app/firebase'
-
 type Inputs = {
   email: string
   password: string
@@ -22,7 +21,7 @@ export default function Register() {
   } = useForm<Inputs>()
 
   const onSubmit: SubmitHandler<Inputs> = async (data: Inputs) => {
-    await createUserWithEmailAndPassword(auth, data.email, data.password)
+    await signInWithEmailAndPassword(auth, data.email, data.password)
       .then((userCredential) => {
         const user = userCredential.user
         router.push('/')
@@ -30,8 +29,8 @@ export default function Register() {
       .catch((error) => {
         const errorCode = error.code
         const errorMessage = error.message
-        if (errorCode === 'auth/email-already-in-use') {
-          alert('このメールアドレスは既に登録されています。')
+        if (errorCode === 'auth/invalid-login-credentials') {
+          alert('そのようなユーザーは存在しません。')
         } else {
           alert(errorMessage)
         }
@@ -43,7 +42,7 @@ export default function Register() {
       <div className='flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8'>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
           <h2 className='mt-10 text-center text-2xl font-bold leading-9 tracking-tight text-gray-900'>
-            新規登録
+            ログイン
           </h2>
         </div>
 
@@ -111,15 +110,15 @@ export default function Register() {
                 type='submit'
                 className='flex w-full justify-center rounded-md bg-indigo-600 px-3 py-1.5 text-sm font-semibold leading-6 text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600'
               >
-                サインアップ
+                サインイン
               </button>
             </div>
             <div className='text-sm'>
               <Link
-                href='/auth/login'
+                href='/auth/register'
                 className='font-semibold text-indigo-600 hover:text-indigo-500'
               >
-                アカウントをお持ちの方はこちら
+                初めての方はこちら
               </Link>
             </div>
           </form>
